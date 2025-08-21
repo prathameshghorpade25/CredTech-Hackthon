@@ -1,0 +1,39 @@
+# Core data processing and modeling
+pandas==1.5.3
+numpy==1.24.4
+scikit-learn==1.3.2
+lightgbm==3.3.5
+joblib==1.3.2
+matplotlib==3.7.3
+shap==0.43.0
+python-dateutil==2.8.2
+vaderSentiment==3.3.2
+
+# Web application
+streamlit==1.26.0
+watchdog==3.0.0  # For auto-reloading in development
+
+# Production dependencies
+gunicorn==21.2.0  # WSGI HTTP Server
+uvicorn==0.24.0   # ASGI server implementation
+fastapi==0.104.1  # API framework (optional for API endpoints)
+
+# Monitoring and logging
+pythonjsonlogger==2.0.7  # JSON formatter for Python logging
+promptlayer==0.1.80     # Monitoring for ML models
+psutil==5.9.6          # System monitoring utilities
+prometheus-client==0.17.1  # Prometheus metrics exporter
+
+# Testing and quality
+pytest==7.4.3
+pytest-cov==4.1.0
+flake8==6.1.0
+black==23.11.0
+isort==5.12.0
+
+# Security
+pydantic==2.5.1  # Data validation
+python-dotenv==1.0.0  # Environment variable management
+
+
+

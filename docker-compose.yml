@@ -1,0 +1,103 @@
+version: '3.9'
+
+networks:
+  credtech_network:
+    driver: bridge
+
+volumes:
+  model_data:
+  logs_data:
+
+services:
+  pipeline:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: credtech/xscore-pipeline:latest
+    container_name: credtech-pipeline
+    command: python run_all.py
+    volumes:
+      - model_data:/app/models
+      - logs_data:/app/logs
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+    restart: on-failure
+    networks:
+      - credtech_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/models/model.joblib') else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: credtech/xscore-app:latest
+    container_name: credtech-app
+    command: streamlit run src/serve/app.py
+    volumes:
+      - model_data:/app/models:ro
+      - logs_data:/app/logs
+    working_dir: /app
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONPATH=/app
+    restart: always
+    networks:
+      - credtech_network
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: credtech/xscore-api:latest
+    container_name: credtech-api
+    command: python run_api.py
+    volumes:
+      - model_data:/app/models:ro
+      - logs_data:/app/logs
+    working_dir: /app
+    ports:
+      - "8000:8000"
+      - "9090:9090"
+    environment:
+      - PYTHONPATH=/app
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - API_WORKERS=2
+      - LOG_LEVEL=info
+      - ENVIRONMENT=production
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - PROMETHEUS_PORT=9090
+      - METRICS_COLLECTION_INTERVAL=60
+      - ALERT_CPU_THRESHOLD=80.0
+      - ALERT_MEMORY_THRESHOLD=80.0
+      - ALERT_DISK_THRESHOLD=80.0
+      - ALERT_ERROR_RATE_THRESHOLD=0.05
+      - ALERT_RESPONSE_TIME_THRESHOLD=1.0
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8501
+      - ALLOWED_HOSTS=localhost,127.0.0.1,credtech-api
+    restart: always
+    depends_on:
+      pipeline:
+        condition: service_healthy
+    networks:
+      - credtech_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+
+

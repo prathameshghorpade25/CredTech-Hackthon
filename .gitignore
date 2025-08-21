@@ -1,0 +1,23 @@
+# python
+__pycache__/
+*.pyc
+env/
+.venv/
+venv/
+
+# data
+data/raw/
+data/processed/
+
+# vscode
+.vscode/
+
+# notebooks
+.ipynb_checkpoints
+
+# logs & artifacts
+logs/
+reports/figures/
+
+
+
