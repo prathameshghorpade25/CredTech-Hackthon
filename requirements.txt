@@ -19,7 +19,7 @@ uvicorn==0.24.0   # ASGI server implementation
 fastapi==0.104.1  # API framework (optional for API endpoints)
 
 # Monitoring and logging
-pythonjsonlogger==2.0.7  # JSON formatter for Python logging
+python-json-logger==2.0.7  # JSON formatter for Python logging
 promptlayer==0.1.80     # Monitoring for ML models
 psutil==5.9.6          # System monitoring utilities
 prometheus-client==0.17.1  # Prometheus metrics exporter
